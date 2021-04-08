@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+	Quiz Daniel Hernando Gil Cusi (6000428) - 08/04/2021
+
+    <head>
+        <title>Ejercicio 3.4 </title>
+        <style>
+            html, body { margin: 0; padding: 0; overflow: hidden; }
+            #info {
+                position: absolute;
+                padding: 10px;
+                width: 100%;
+                text-align: center;
+                color: #FFFFFF;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="info">Ejercicio 3.4<br/>
+            Usar flecha arriba para modificar paso a paso.<br/>
+			Estado inicial/Primer Estado<br/>
+        </div>
+    <script src="js/three.min.js"></script>
+    <script>
+	var scene, aspect, camera, renderer;
+	var startTime = Date.now();
+	var pressed = false;
+	var upArrow = false;
+	var tempMatrix;
+	var flag = 0;
+
+
+	var esferaReal;
+	var matrizE = new THREE.Matrix4();
+    var matrizT = new THREE.Matrix4();
+    var matrizRx = new THREE.Matrix4();
+    var matrizRy = new THREE.Matrix4();
+    var matrizRz = new THREE.Matrix4();
+   
+init();
+animate();
+
+function init() {
+    //INICIALIZACIÓN DE LA ESCENA
+    scene = new THREE.Scene();
+    aspect = window.innerWidth / window.innerHeight;
+    camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    //EVENTOS DE TECLADO
+    //Códigos de las teclas: https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+    var onKeyDown = function(event) {
+        switch (event.keyCode) {
+            case 38: //Se está oprimiendo la tecla
+                upArrow = true;
+                break;
+        }
+    };
+
+    var onKeyUp = function(event) {
+        switch (event.keyCode) {
+            case 38: //No se está oprimiendo la tecla
+                pressed = false;
+                upArrow = false;
+                break;
+        }
+    };
+
+    document.addEventListener('keydown', onKeyDown, false);
+    document.addEventListener('keyup', onKeyUp, false);
+
+    //ELEMENTOS DE ESCENA
+    var size = 10;
+    var arrowSize = 6;
+    var divisions = size;
+    var origin = new THREE.Vector3(0, 0, 0);
+    var x = new THREE.Vector3(1, 0, 0);
+    var y = new THREE.Vector3(0, 1, 0);
+    var z = new THREE.Vector3(0, 0, 1);
+    var color1 = new THREE.Color(0xFFFFFF);
+    var color2 = new THREE.Color(0xAAABAD);
+    var colorR = new THREE.Color(0xAA3333);
+    var colorG = new THREE.Color(0x33AA33);
+    var colorB = new THREE.Color(0x333366);
+    var colorRd = new THREE.Color(0xAA6666);
+    var colorGd = new THREE.Color(0x66AA66);
+    var colorBd = new THREE.Color(0x6666AA);
+
+    //CREAR LAS GRILLAS PARA EL ESCENARIO
+    var axesHelper = new THREE.AxesHelper(size);
+    var gridHelperXY = new THREE.GridHelper(size, divisions, color1, color1);
+    var gridHelperXZ = new THREE.GridHelper(size, divisions, color2, color2);
+    var gridHelperYZ = new THREE.GridHelper(size, divisions, color2, color2);
+
+    //ROTARLAS PARA QUE QUEDEN EN EL ESPACIO ADECUADO
+    gridHelperXY.rotateOnWorldAxis(x, THREE.Math.degToRad(90));
+    gridHelperXZ.rotateOnWorldAxis(y, THREE.Math.degToRad(90));
+    gridHelperYZ.rotateOnWorldAxis(z, THREE.Math.degToRad(90));
+
+    //CREAR LAS FLECHAS QUE INDICAN LOS EJES DE COORDENADAS 3D
+    var arrowX = new THREE.ArrowHelper(x, origin, arrowSize, colorR);
+    var arrowY = new THREE.ArrowHelper(y, origin, arrowSize, colorG);
+    var arrowZ = new THREE.ArrowHelper(z, origin, arrowSize, colorB);
+
+    //CREAR LAS GEOMETRÍAS
+    var esfera = new THREE.SphereGeometry(1, 16, 16);
+    var esferaMaterial = new THREE.MeshBasicMaterial({wireframe: true, color: 0xFFEB5E});
+    esferaReal = new THREE.Mesh(esfera, esferaMaterial);
+
+
+    esferaReal.matrixAutoUpdate = false;
+
+    //AGREGAR A LA ESCENA
+    scene.add(gridHelperXZ);
+    scene.add(arrowX);
+    scene.add(arrowY);
+    scene.add(arrowZ);
+    scene.add(esferaReal);
+
+    //MOVER LA CÁMARA
+    camera.position.x = 3;
+    camera.position.y = 3;
+    camera.position.z = 3;
+    camera.lookAt(origin);
+
+    renderer.render(scene, camera);
+}
+
+function animate() {
+    render();
+    requestAnimationFrame(animate);
+}
+
+function render() {
+    var dtime = Date.now() - startTime;
+    var sx = 1;
+    var sy = 1;
+    var sz = 1;
+    //Los valores deseados para la escala
+    var sx_temp = 0.5;
+    var sy_temp = 0.5;
+    var sz_temp = 3;
+
+    var tx = 0;
+    var ty = 0;
+    var tz = 0;
+
+    var ct, st, theta;
+
+    if (upArrow && !pressed) {
+        pressed = true;
+        switch (flag) {
+            case 0:
+                flag = 1;
+				document.getElementById("info").innerHTML = "Segundo estado: Escalado en X";
+                //Segundo estado: Esfera escalada en x
+
+				//Asignar a los factores de escala de la matriz el valor guardado en las varibales temporales
+                sx = sx_temp;
+                matrizE.set(sx, 0, 0, 0,
+                    0, sy, 0, 0,
+                    0, 0, sz, 0,
+                    0, 0, 0, 1);
+				//Aplicar los cambios
+                esferaReal.applyMatrix(matrizE);
+				camera.position.x = 0;
+				camera.position.y = 3;
+				camera.position.z = 3;
+
+				console.log("Segundo estado");
+                break;
+            case 1:
+                flag = 2;
+				document.getElementById("info").innerHTML = "Tercer estado: Escalado en Y";
+                //Tercer estado: Esfera escalada en y
+
+                sy = sy_temp;
+                matrizE.set(sx, 0, 0, 0,
+                    0, sy, 0, 0,
+                    0, 0, sz, 0,
+                    0, 0, 0, 1);
+                esferaReal.applyMatrix(matrizE);
+
+				camera.position.x = 3;
+				camera.position.y = 0;
+				camera.position.z = 3;
+
+				console.log("Tercer estado");
+                break;
+            case 2:
+                flag = 3;
+				document.getElementById("info").innerHTML = "Cuarto estado: Escalado en Z";
+                //Cuarto estado: Esfera escalada en z
+                
+                sz = sz_temp;
+                matrizE.set(sx, 0, 0, 0,
+                    0, sy, 0, 0,
+                    0, 0, sz, 0,
+                    0, 0, 0, 1);
+                esferaReal.applyMatrix(matrizE);
+
+				camera.position.x = 2.5;
+				camera.position.y = 5;
+				camera.position.z = 5;
+
+				console.log("Cuarto estado");
+                break;
+            case 3:
+                flag = 4;
+                document.getElementById("info").innerHTML = "Quinto estado: Trasladado en Z";
+                //Quinto estado: Trasladar en z
+
+                tz = sz_temp; //Se va a trasladar el mismo valor de escala, ya que después de la escala, la esfera tiene un diametro de 6
+
+        
+                matrizT.set(1, 0, 0, tx,
+                    0, 1, 0, ty,
+                    0, 0, 1, tz,
+                    0, 0, 0, 1);
+                esferaReal.applyMatrix(matrizT);
+
+                camera.position.x = 3;
+				camera.position.y = 3;
+				camera.position.z = 0;
+				console.log("Quinto estado");
+
+                break;
+            case 4:
+                flag = 5;
+                document.getElementById("info").innerHTML = "Sexto estado: Rotar en Y";
+                //Sexto estado: Rotar en y
+
+                //Se utilizan 45 grados para realizar la rotación en los 3 ejes ya que la recta x = y = z cumple con esta propiedad
+                theta = 45;
+                ct = Math.cos(theta);
+                st = Math.sin(theta);
+
+                  //la primera rotación debe ser en Y, para que ya desde el plano xz esté a 45 grados
+                  matrizRy.set(ct, 0, st, 0,
+                    0, 1, 0, 0,
+                    -st, 0, ct, 0,
+                    0, 0, 0, 1);
+                esferaReal.applyMatrix(matrizRy);
+
+                camera.position.x = 0;
+				camera.position.y = 5;
+				camera.position.z = 5;
+				console.log("Sexto estado");
+                
+                break;
+            case 5:
+                flag = 6;
+                break;
+            case 6:
+                flag = 7;
+                break;
+            case 7:
+                //Falta corregir 
+                flag = 0;
+                document.getElementById("info").innerHTML = "Primer estado: Recuperar estado original";
+                //Primer estado: Recuperar escala inicial del objeto
+
+                //Divido los valores de escala por los valores deseados, lo que es recuperar el valor inicial
+                sz /= sz_temp;
+                sx /= sx_temp;
+                sy /= sy_temp;
+                matrizE.set(sx, 0, 0, 0,
+                    0, sy, 0, 0,
+                    0, 0, sz, 0,
+                    0, 0, 0, 1);
+                esferaReal.applyMatrix(matrizE);
+
+                console.log("Primer estado");
+                break;
+
+        }
+    }
+
+    camera.lookAt(0, 0, 0);
+    renderer.render(scene, camera);
+}
+    </script>
+  </body>
+</html>
