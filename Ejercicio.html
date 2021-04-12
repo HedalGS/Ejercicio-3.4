@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
-	Quiz Daniel Hernando Gil Cusi (6000428) - 08/04/2021
-
+	Quiz Daniel Hernando Gil Cusi (6000428) - V2
     <head>
         <title>Ejercicio 3.4 </title>
         <style>
@@ -22,21 +21,27 @@
         </div>
     <script src="js/three.min.js"></script>
     <script>
-	var scene, aspect, camera, renderer;
-	var startTime = Date.now();
-	var pressed = false;
-	var upArrow = false;
-	var tempMatrix;
-	var flag = 0;
 
+/* EJERCICIO 3.4
+Comienza con una esfera de radio uno centrada en el origen de coordenadas. La
+figura (e) muestra la esfera escalada con factores de escala sx = sy = 0,5 y sz = 3. Obt´en
+las transformaciones que situan a la esfera tal y como se muestra en la figura (f ), donde un
+punto final est´a en el origen y el otro en la recta x = y = z.
+*/
+var scene, aspect, camera, renderer;
+var startTime = Date.now();
+var pressed = false;
+var upArrow = false;
+var tempMatrix;
+var flag = 0;
 
-	var esferaReal;
-	var matrizE = new THREE.Matrix4();
-    var matrizT = new THREE.Matrix4();
-    var matrizRx = new THREE.Matrix4();
-    var matrizRy = new THREE.Matrix4();
-    var matrizRz = new THREE.Matrix4();
-   
+var esferaReal;
+var matrizE = new THREE.Matrix4();
+var matrizT = new THREE.Matrix4();
+var matrizRx = new THREE.Matrix4();
+var matrizRy = new THREE.Matrix4();
+var matrizRz = new THREE.Matrix4();
+
 init();
 animate();
 
@@ -81,9 +86,9 @@ function init() {
     var z = new THREE.Vector3(0, 0, 1);
     var color1 = new THREE.Color(0xFFFFFF);
     var color2 = new THREE.Color(0xAAABAD);
-    var colorR = new THREE.Color(0xAA3333);
-    var colorG = new THREE.Color(0x33AA33);
-    var colorB = new THREE.Color(0x333366);
+    var colorR = new THREE.Color(0xF51C00);
+    var colorG = new THREE.Color(0x0BD426);
+    var colorB = new THREE.Color(0x0C25F6);
     var colorRd = new THREE.Color(0xAA6666);
     var colorGd = new THREE.Color(0x66AA66);
     var colorBd = new THREE.Color(0x6666AA);
@@ -106,7 +111,10 @@ function init() {
 
     //CREAR LAS GEOMETRÍAS
     var esfera = new THREE.SphereGeometry(1, 16, 16);
-    var esferaMaterial = new THREE.MeshBasicMaterial({wireframe: true, color: 0xFFEB5E});
+    var esferaMaterial = new THREE.MeshBasicMaterial({
+        wireframe: true,
+        color: 0xFFEB5E
+    });
     esferaReal = new THREE.Mesh(esfera, esferaMaterial);
 
 
@@ -135,6 +143,7 @@ function animate() {
 
 function render() {
     var dtime = Date.now() - startTime;
+    //Los factores de escala para la matriz
     var sx = 1;
     var sy = 1;
     var sz = 1;
@@ -142,141 +151,226 @@ function render() {
     var sx_temp = 0.5;
     var sy_temp = 0.5;
     var sz_temp = 3;
-
+    //Se establecen los 3 factores de traslación, aunque sólo se trasladará en z
     var tx = 0;
     var ty = 0;
     var tz = 0;
 
-    var ct, st, theta;
+    //Se utilizan 45 grados para realizar la rotación en los 3 ejes ya que la recta x = y = z cumple con esta propiedad
+    var theta = 45;
+    //Factores de rotación
+    var ct = Math.cos(theta);
+    var st = Math.sin(theta);
 
+    //Condicionl para cada vez que se presiona la tecla
     if (upArrow && !pressed) {
         pressed = true;
-        switch (flag) {
-            case 0:
-                flag = 1;
-				document.getElementById("info").innerHTML = "Segundo estado: Escalado en X";
-                //Segundo estado: Esfera escalada en x
 
-				//Asignar a los factores de escala de la matriz el valor guardado en las varibales temporales
-                sx = sx_temp;
-                matrizE.set(sx, 0, 0, 0,
-                    0, sy, 0, 0,
-                    0, 0, sz, 0,
-                    0, 0, 0, 1);
-				//Aplicar los cambios
-                esferaReal.applyMatrix(matrizE);
-				camera.position.x = 0;
-				camera.position.y = 3;
-				camera.position.z = 3;
+        //Condicional para entrar en el paso a paso de escalada del objeto 
+        if (flag <= 2) {
+            switch (flag) {
+                case 0:
+                    flag = 1;
+                    document.getElementById("info").innerHTML = "Segundo estado: Escalado en X";
+                    //Segundo estado: Esfera escalada en x
 
-				console.log("Segundo estado");
-                break;
-            case 1:
-                flag = 2;
-				document.getElementById("info").innerHTML = "Tercer estado: Escalado en Y";
-                //Tercer estado: Esfera escalada en y
+                    //Se asigna el valor de escala deseado en el factor de la matriz
+                    sx = sx_temp;
+                    //Pero se mantienen los valores en los otros ejes
+                    sy = 1;
+                    sz = 1;
 
-                sy = sy_temp;
-                matrizE.set(sx, 0, 0, 0,
-                    0, sy, 0, 0,
-                    0, 0, sz, 0,
-                    0, 0, 0, 1);
-                esferaReal.applyMatrix(matrizE);
+                    camera.position.x = 0;
+                    camera.position.y = 3;
+                    camera.position.z = 3;
 
-				camera.position.x = 3;
-				camera.position.y = 0;
-				camera.position.z = 3;
+                    console.log("Segundo estado");
+                    break;
+                case 1:
+                    flag = 2;
+                    document.getElementById("info").innerHTML = "Tercer estado: Escalado en Y";
+                    //Tercer estado: Esfera escalada en y
 
-				console.log("Tercer estado");
-                break;
-            case 2:
-                flag = 3;
-				document.getElementById("info").innerHTML = "Cuarto estado: Escalado en Z";
-                //Cuarto estado: Esfera escalada en z
-                
-                sz = sz_temp;
-                matrizE.set(sx, 0, 0, 0,
-                    0, sy, 0, 0,
-                    0, 0, sz, 0,
-                    0, 0, 0, 1);
-                esferaReal.applyMatrix(matrizE);
+                    sy = sy_temp;
+                    sx = 1;
+                    sz = 1;
 
-				camera.position.x = 2.5;
-				camera.position.y = 5;
-				camera.position.z = 5;
+                    camera.position.x = 3;
+                    camera.position.y = 0;
+                    camera.position.z = 3;
 
-				console.log("Cuarto estado");
-                break;
-            case 3:
-                flag = 4;
-                document.getElementById("info").innerHTML = "Quinto estado: Trasladado en Z";
-                //Quinto estado: Trasladar en z
+                    console.log("Tercer estado");
+                    break;
+                case 2:
+                    flag = 3;
+                    document.getElementById("info").innerHTML = "Imagen E: Escalado en Z";
+                    //Cuarto estado: Esfera escalada en z
 
-                tz = sz_temp; //Se va a trasladar el mismo valor de escala, ya que después de la escala, la esfera tiene un diametro de 6
+                    sz = sz_temp;
+                    sx = 1;
+                    sy = 1;
 
-        
-                matrizT.set(1, 0, 0, tx,
-                    0, 1, 0, ty,
-                    0, 0, 1, tz,
-                    0, 0, 0, 1);
-                esferaReal.applyMatrix(matrizT);
+                    camera.position.x = 2.5;
+                    camera.position.y = 5;
+                    camera.position.z = 5;
 
-                camera.position.x = 3;
-				camera.position.y = 3;
-				camera.position.z = 0;
-				console.log("Quinto estado");
+                    console.log("Cuarto Estado: Imagen E");
+                    break;
 
-                break;
-            case 4:
-                flag = 5;
-                document.getElementById("info").innerHTML = "Sexto estado: Rotar en Y";
-                //Sexto estado: Rotar en y
+            }
+            //Después de cada selección en el switch, se actualiza la matriz de escala de manera general
+            matrizE.set(sx, 0, 0, 0,
+                0, sy, 0, 0,
+                0, 0, sz, 0,
+                0, 0, 0, 1);
+            esferaReal.applyMatrix(matrizE);
+        }
 
-                //Se utilizan 45 grados para realizar la rotación en los 3 ejes ya que la recta x = y = z cumple con esta propiedad
-                theta = 45;
-                ct = Math.cos(theta);
-                st = Math.sin(theta);
+        //Condicional para realizar la única traslación necesaria
+        else if (flag == 3) {
 
-                  //la primera rotación debe ser en Y, para que ya desde el plano xz esté a 45 grados
-                  matrizRy.set(ct, 0, st, 0,
-                    0, 1, 0, 0,
-                    -st, 0, ct, 0,
-                    0, 0, 0, 1);
-                esferaReal.applyMatrix(matrizRy);
+            flag = 4;
+            document.getElementById("info").innerHTML = "Quinto estado: Trasladado en Z";
+            //Quinto estado: Trasladar en z
 
-                camera.position.x = 0;
-				camera.position.y = 5;
-				camera.position.z = 5;
-				console.log("Sexto estado");
-                
-                break;
-            case 5:
-                flag = 6;
-                break;
-            case 6:
-                flag = 7;
-                break;
-            case 7:
-                //Falta corregir 
-                flag = 0;
-                document.getElementById("info").innerHTML = "Primer estado: Recuperar estado original";
-                //Primer estado: Recuperar escala inicial del objeto
+            //Se va a trasladar el mismo valor de escala, ya que después de la escala, la esfera tiene un radio de sz_temp en z
+            tz = sz_temp;
 
-                //Divido los valores de escala por los valores deseados, lo que es recuperar el valor inicial
-                sz /= sz_temp;
-                sx /= sx_temp;
-                sy /= sy_temp;
-                matrizE.set(sx, 0, 0, 0,
-                    0, sy, 0, 0,
-                    0, 0, sz, 0,
-                    0, 0, 0, 1);
-                esferaReal.applyMatrix(matrizE);
+            matrizT.set(1, 0, 0, tx,
+                0, 1, 0, ty,
+                0, 0, 1, tz,
+                0, 0, 0, 1);
+            esferaReal.applyMatrix(matrizT);
 
-                console.log("Primer estado");
-                break;
+            camera.position.x = 3;
+            camera.position.y = 3;
+            camera.position.z = 0;
+            console.log("Quinto estado");
 
         }
+
+        //Condicional para entrar en el paso a paso de la rotación del objeto
+        else if (flag > 3 && flag <= 6) {
+
+            switch (flag) {
+
+                case 4:
+                    flag = 5;
+                    document.getElementById("info").innerHTML = "Sexto estado: Rotado en Y";
+                    //Sexto estado: Rotar en y
+
+                    //la primera rotación debe ser en Y, para que ya desde el plano xz esté a 45 grados
+                    matrizRy.set(ct, 0, st, 0,
+                        0, 1, 0, 0,
+                        -st, 0, ct, 0,
+                        0, 0, 0, 1);
+                    esferaReal.applyMatrix(matrizRy);
+
+                    camera.position.x = 0;
+                    camera.position.y = 5;
+                    camera.position.z = 5;
+                    console.log("Sexto estado");
+
+                    break;
+                case 5:
+                    flag = 6;
+                    document.getElementById("info").innerHTML = "Séptimo estado: Rotado en X";
+                    //Séptimo estado: Rotar en x
+
+                    //Después se rota en X y Z para "levantar" el obejeto y quedé apuntando a la recta x = y = z 
+                    matrizRx.set(1, 0, 0, 0,
+                        0, ct, -st, 0,
+                        0, st, ct, 0,
+                        0, 0, 0, 1);
+                    esferaReal.applyMatrix(matrizRx);
+
+                    camera.position.x = 8;
+                    camera.position.y = 0;
+                    camera.position.z = 5;
+                    console.log("Séptimo estado");
+                    break;
+                case 6:
+                    flag = 7;
+                    document.getElementById("info").innerHTML = "Imagen F: Rotado en Z";
+                    //Octavo estado: Rotar en z
+
+                    matrizRz.set(ct, -st, 0, 0,
+                        st, ct, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1);
+                    esferaReal.applyMatrix(matrizRz);
+
+                    camera.position.x = 5;
+                    camera.position.y = 4;
+                    camera.position.z = 8;
+                    console.log("Octavo Estado: Imagen F");
+                    break;
+            }
+
+        }
+
+        //Condicional final para entrar en los pasos para recuperar el estado original del objeto
+        else if (flag == 7) {
+            flag = 0;
+            document.getElementById("info").innerHTML = "Primer estado: Estado inicial";
+            //Primer estado: Recuperar escala, posición y rotación iniciales del objeto
+
+            //Para revertir la rotación se utiliza el negativo del ángulo con que se rotó antes
+            theta *= -1;
+            //Y se actualizan los valores de ct y st, respecto al nuevo valor de theta
+            ct = Math.cos(theta);
+            st = Math.sin(theta);
+
+            //Se realizan las transformaciones en orden inverso para recuperar el estado original
+
+            //La rotación se resuelve en el orden inverso al que se utilizó antes para los 3 ejes
+            matrizRz.set(ct, -st, 0, 0,
+                st, ct, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1);
+            esferaReal.applyMatrix(matrizRz);
+
+            matrizRx.set(1, 0, 0, 0,
+                0, ct, -st, 0,
+                0, st, ct, 0,
+                0, 0, 0, 1);
+            esferaReal.applyMatrix(matrizRx);
+
+            matrizRy.set(ct, 0, st, 0,
+                0, 1, 0, 0,
+                -st, 0, ct, 0,
+                0, 0, 0, 1);
+            esferaReal.applyMatrix(matrizRy);
+
+            //Se trsladará el negativo que se trasladó antes
+            tz = -sz_temp;
+            matrizT.set(1, 0, 0, tx,
+                0, 1, 0, ty,
+                0, 0, 1, tz,
+                0, 0, 0, 1);
+            esferaReal.applyMatrix(matrizT);
+
+            //Divido los valores de escala por los valores deseados, lo que es recuperar la escala inicial
+            sz /= sz_temp;
+            sx /= sx_temp;
+            sy /= sy_temp;
+            matrizE.set(sx, 0, 0, 0,
+                0, sy, 0, 0,
+                0, 0, sz, 0,
+                0, 0, 0, 1);
+            esferaReal.applyMatrix(matrizE);
+
+            camera.position.x = 3;
+            camera.position.y = 3;
+            camera.position.z = 3;
+
+
+            console.log("Primer estado: Esfera inicial");
+
+        }
+
     }
+
 
     camera.lookAt(0, 0, 0);
     renderer.render(scene, camera);
